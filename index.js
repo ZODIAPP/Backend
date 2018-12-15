@@ -41,11 +41,26 @@ app.get('/login', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
+    var username, password, birth_date;
+    if (req.param('username') != undefined)
+        username = req.param('username');
+    else
+        username = null;
+
+    if (req.param('password') != undefined)
+        password = req.param('password')
+    else
+        password = null;
+
+    if (req.param('birth_date') != undefined)
+        birth_date = req.param('birth_date')
+    else
+        birth_date = null;
 
     var new_user = {
-        "username": req.param('username'),
-        "password": req.param('password'),
-        "birth_date": req.param('birth_date')
+        "username": username,
+        "password": password,
+        "birth_date": birth_date
     }
 
     // Psuedo DB Push
