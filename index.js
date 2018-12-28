@@ -12,10 +12,12 @@ Run Methods:
 
 // Module Implementation
 const express = require('express');
+const bodyParser = require('body-parser')
 
 // App Initialization
 const app = express();
-
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 /*
 CRUD Functionality -- Postman Compatibility
 
@@ -25,8 +27,9 @@ app,put()
 app.delete()
 */
 
-// Psuedo DB (Temporary)
-var user_db = [];
+// PostgreSQL DB
+var pgp = require('pg-promise')(/*options*/)
+var db = pgp('postgres://username:password@host:port/database')
 
 
 // Index Page (Check cache, user authentication, tokens)
@@ -35,38 +38,76 @@ app.get('/', (req, res) => {
 })
 
 // Login Page (Index page cannot resolve user)
-
-app.get('/login', (req, res) => {
+app.get('/register', (req, res) => {
     res.send("Index Redirect -- Authentication Fault -- IMPLEMENT ME");
 })
 
-app.post('/login', (req, res) => {
-    var username, password, birth_date;
-    if (req.param('username') != undefined)
-        username = req.param('username');
-    else
-        username = null;
-
-    if (req.param('password') != undefined)
-        password = req.param('password')
-    else
-        password = null;
-
-    if (req.param('birth_date') != undefined)
-        birth_date = req.param('birth_date')
-    else
-        birth_date = null;
+app.post('/register', (req, res) => {
+    let username = req.body.username;
+    let password = req.body.password;
+    let email = req.body.email;
+    let birthdate = req.body.birthdate;
 
     var new_user = {
         "username": username,
         "password": password,
-        "birth_date": birth_date
+        "email": email,
+        "birth_date": birthdate
     }
 
-    // Psuedo DB Push
-    user_db.push(new_user);
+    console.log("Got username: " + username)
+    console.log("Got password: " + password)
+    console.log("Got email: " + email)
+    console.log("Got birthdate: " + birthdate)
+
+    /*
+        So this whole segment is attempting to find a way
+        to make each *_check variable false. We define these
+        variables with our preliminary check that sets the
+        check to true if the reqest was not blank. Then I provide
+        extensive checks using regular expressions to further
+        evaluate the viability of the user's request.
+        https://stackoverflow.com/questions/6603015/check-whether-a-string-matches-a-regex-in-js
+    */
+    // Preliminary empty check (If empty, set variable false)
+    var user_check = (username != "")
+    var pass_check = (password != "")
+    var email_check = (email != "")
+    var birth_check = (birthdate != "")
+
+    // Extensive username check
+    user_check = /^[a-zA-Z]+$/i.test(username)
     
-    res.send(`Added New User! Username: ${new_user.username} // Password: ${new_user.password} // Birth Date: ${new_user.birth_date}`);
+    // Extensive password check (FIXME Weird symbols can bypass i.e. ∫œß)
+    pass_check = /^[\w\W]/i.test(password)
+
+    // Extensive email check 
+    // https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
+    email_check = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/.test(email)
+    
+
+    // Extensive birthdate check (and make sure user age is at least 18)
+    birth_check = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(birthdate)
+    let year = parseInt(birthdate.substring(6, 10))
+    let month = parseInt(birthdate.substring(0, 2))
+    let day = parseInt(birthdate.substring(3, 5))
+
+    var date = new Date();
+
+    if (birth_check && date.getFullYear() - year < 17){
+        birth_check = false
+    }
+
+    res.json({ 
+        username: user_check,
+        password: pass_check,
+        email: email_check,
+        birthdate: birth_check
+    });
+    
+    // Psuedo DB Push
+    //user_db.push(new_user);
+
 })
 
 
