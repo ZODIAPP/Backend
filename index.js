@@ -31,22 +31,28 @@ app.delete()
 var pgp = require('pg-promise')(/*options*/)
 var db = pgp('postgres://username:password@host:port/database')
 
+/*
+            -= Important PostgreSQL Commands =-
+    - create database [DATABASE]  // Creates database
+    - drop databse [DATABASE]     // Removes database
+    - /l                          // Lists databases
+    - /c [DATABASE]               // Connect to database
+    - /q                          // Disconnect databases
+
+*/
 
 // Index Page (Check cache, user authentication, tokens)
 app.get('/', (req, res) => {
     res.send("Call Xcode Index/Login -- IMPLEMENT ME");
 })
 
-// Login Page (Index page cannot resolve user)
+// Login Page (Used for input validility screening)
 app.get('/register', (req, res) => {
-    res.send("Index Redirect -- Authentication Fault -- IMPLEMENT ME");
-})
 
-app.post('/register', (req, res) => {
-    let username = req.body.username;
-    let password = req.body.password;
-    let email = req.body.email;
-    let birthdate = req.body.birthdate;
+    let username = req.query.username;
+    let password = req.query.password;
+    let email = req.query.email;
+    let birthdate = req.query.birthdate;
 
     var new_user = {
         "username": username,
@@ -59,7 +65,7 @@ app.post('/register', (req, res) => {
     console.log("Got password: " + password)
     console.log("Got email: " + email)
     console.log("Got birthdate: " + birthdate)
-
+ 
     /*
         So this whole segment is attempting to find a way
         to make each *_check variable false. We define these
@@ -86,28 +92,33 @@ app.post('/register', (req, res) => {
     email_check = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/.test(email)
     
 
-    // Extensive birthdate check (and make sure user age is at least 18)
-    birth_check = /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/.test(birthdate)
+    // Extensive birthdate check
+    //  - Make sure user age is at least 18
+    //  - Make sure they're not an absurd age (cutoff is 1900)
+    // https://stackoverflow.com/questions/2520633/what-is-the-mm-dd-yyyy-regular-expression-and-how-do-i-use-it-in-php
+    birth_check = /(0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])[- \/.](19|20)\d\d/.test(birthdate)
     let year = parseInt(birthdate.substring(6, 10))
-    let month = parseInt(birthdate.substring(0, 2))
-    let day = parseInt(birthdate.substring(3, 5))
-
     var date = new Date();
-
-    if (birth_check && date.getFullYear() - year < 17){
+    console.log(birth_check)
+    if (birth_check && parseInt(date.getFullYear() - year) < 17){
         birth_check = false
     }
 
-    res.json({ 
-        username: user_check,
-        password: pass_check,
-        email: email_check,
-        birthdate: birth_check
-    });
+    // If everything checks out return true, otherwise, return false
+    if (user_check && pass_check && email_check && birth_check){
+        res.send(true)
+    } else {
+        res.send(false)
+    }
     
     // Psuedo DB Push
     //user_db.push(new_user);
 
+})
+
+// Register user is .get verifies (front end should take care of this)
+app.post('/register', (req, res) => {
+    res.send(true)
 })
 
 
