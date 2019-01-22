@@ -4,7 +4,8 @@ SOFTWARE REQUIREMENTS:
 - Realm ($ npm install realm)
 
 For help on module:
-https://www.youtube.com/watch?v=O3ZqG7h5ZHw
+- https://realm.io/docs/javascript/latest
+- https://www.youtube.com/watch?v=O3ZqG7h5ZHw
 
 */
 const Realm = require('realm');
