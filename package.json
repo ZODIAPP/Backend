@@ -18,6 +18,7 @@
   "homepage": "https://github.com/ZODIAPP/Backend#readme",
   "dependencies": {
     "express": "^4.16.4",
-    "pg-promise": "^8.5.4"
+    "pg-promise": "^8.5.4",
+    "realm": "^2.22.0"
   }
 }

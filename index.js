@@ -12,7 +12,7 @@ Run Methods:
 
 // Module Implementation
 const express = require('express');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
 // App Initialization
 const app = express();
@@ -27,19 +27,8 @@ app,put()
 app.delete()
 */
 
-// PostgreSQL DB
-var pgp = require('pg-promise')(/*options*/)
-var db = pgp('postgres://username:password@host:port/database')
-
-/*
-            -= Important PostgreSQL Commands =-
-    - create database [DATABASE]  // Creates database
-    - drop databse [DATABASE]     // Removes database
-    - /l                          // Lists databases
-    - /c [DATABASE]               // Connect to database
-    - /q                          // Disconnect databases
-
-*/
+// Database St00f
+const { createUser } = require('./database')
 
 // Index Page (Check cache, user authentication, tokens)
 app.get('/', (req, res) => {
@@ -89,6 +78,7 @@ app.get('/register', (req, res) => {
 
     // Extensive email check 
     // https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
+    // FIXME: ngr@uoregon.edu does NOT work
     email_check = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:[A-Z]{2}|com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum)\b/.test(email)
     
 
@@ -118,7 +108,14 @@ app.get('/register', (req, res) => {
 
 // Register user is .get verifies (front end should take care of this)
 app.post('/register', (req, res) => {
-    res.send(true)
+    let username = req.body.username;
+    let password = req.body.password;
+    let usermail = req.body.email;
+    let birthdate = req.body.birthdate;
+
+    const toRegister = { name: username, password: password, birth: birthdate, email: usermail};
+    createUser(toRegister);
+    res.send(true);
 })
 
 
