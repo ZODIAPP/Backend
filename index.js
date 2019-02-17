@@ -108,12 +108,9 @@ app.get('/register', (req, res) => {
 
 // Register user is .get verifies (front end should take care of this)
 app.post('/register', (req, res) => {
-    let username = req.body.username;
-    let password = req.body.password;
-    let usermail = req.body.email;
-    let birthdate = req.body.birthdate;
+    let number = req.body.number;
 
-    const toRegister = { name: username, password: password, birth: birthdate, email: usermail};
+    const toRegister = { name: null, password: null, birth: null, email: null, number:number };
     createUser(toRegister);
     res.send(true);
 })

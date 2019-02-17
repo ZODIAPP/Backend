@@ -1,7 +1,7 @@
 /*
 
 SOFTWARE REQUIREMENTS:
-- Realm ($ npm install realm)
+- Realm (included in package.json)
 
 For help on module:
 - https://realm.io/docs/javascript/latest
@@ -28,7 +28,8 @@ const createUser = (newUser) => {
                 name: newUser.name,
                 password: newUser.password,
                 email: newUser.email,
-                birth: newUser.birth
+                birth: newUser.birth,
+                number: newUser.number
             });
             // TESTING -- DELETE BEFORE RELEASE
             console.log(`Successfully added user ${JSON.stringify(regUser)}`)
