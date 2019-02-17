@@ -23,7 +23,7 @@ CRUD Functionality -- Postman Compatibility
 
 app.get()
 app.post()
-app,put()
+app.put()
 app.delete()
 */
 
